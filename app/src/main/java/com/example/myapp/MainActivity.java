@@ -46,7 +46,9 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 
-
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import androidx.webkit.WebViewAssetLoader;
 
 public class MainActivity extends Activity {
     WebView w;
@@ -82,10 +84,10 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setAllowFileAccess(true);
         s.setMediaPlaybackRequiresUserGesture(false);
-        
+        final WebViewAssetLoader al = new WebViewAssetLoader.Builder().addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this)).build();
         s.setSupportZoom(false); s.setBuiltInZoomControls(false); s.setDisplayZoomControls(false);
         w.setWebViewClient(new WebViewClient() {
-            
+            @Override public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest r) { return al.shouldInterceptRequest(r.getUrl()); }
             @Override
             public void onPageFinished(WebView v, String u) {  v.evaluateJavascript(POLY, null); hideSplash(); }
             @Override public void onReceivedError(WebView v, WebResourceRequest r, WebResourceError e) { if (r.isForMainFrame()) { lastUrl = r.getUrl().toString(); v.loadDataWithBaseURL("https://offline.local/", OFFLINE, "text/html", "utf-8", null); } }
@@ -111,7 +113,7 @@ public class MainActivity extends Activity {
         String[] need = new String[]{"android.permission.READ_EXTERNAL_STORAGE","android.permission.WRITE_EXTERNAL_STORAGE","android.permission.POST_NOTIFICATIONS"};
         if (need.length > 0 && Build.VERSION.SDK_INT >= 23) requestPermissions(need, 1);
         if (Build.VERSION.SDK_INT >= 30 && !Environment.isExternalStorageManager()) { try { startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + getPackageName()))); } catch (Exception e) {} }
-        w.loadUrl("file:///android_asset/index.html");
+        w.loadUrl("https://appassets.androidplatform.net/assets/index.html");
     }
 
     void hideSplash() {

@@ -10,7 +10,7 @@ android {
         versionName '1.0'
     }
     androidResources {
-        noCompress 'html'
+        noCompress 'html','js','json','css','wasm','mp3','mp4','ogg','wav','webm','png','jpg','glb'
     }
     def ks = file('anshify.p12')
     if (ks.exists()) {
@@ -28,3 +28,4 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 }
+dependencies { implementation 'androidx.webkit:webkit:1.8.0' }
